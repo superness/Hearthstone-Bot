@@ -164,6 +164,11 @@ std::vector<Card> HearthstoneMemoryReader::GetCards()
 		{
 			std::vector<std::string> valuePair = split(subItems[j], '=');
 
+			if (valuePair.size() != 2)
+			{
+				break;
+			}
+
 			if (valuePair[0] == std::string("id"))
 			{
 				int val = atoi(valuePair[1].c_str());

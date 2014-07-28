@@ -16,6 +16,7 @@ namespace HearthstoneBot
             GRAVEYARD,
             SETASIDE,
             DECK,
+            REMOVEDFROMGAME,
 
             COUNT
         }
@@ -27,25 +28,35 @@ namespace HearthstoneBot
         {
             get
             {
-                return PlayerZonedCards[(int)Zones.PLAY].First(c => c.Id == 4);
+                return PlayerZonedCards[(int)Zones.PLAY].FirstOrDefault(c => c.Id == 4);
             }
         }
         public CardWrapper OpponentHero
         {
             get
             {
-                return OpponentZonedCards[(int)Zones.PLAY].First(c => c.Id == 36);
+                return OpponentZonedCards[(int)Zones.PLAY].FirstOrDefault(c => c.Id == 36);
             }
         }
 
         private void AddCardToZone(Zones zone, CardWrapper card)
         {
-            if(card.Id <= 35)
+            if(card.Id <= 35 || card.Name == "The Coin")
             {
+                CardWrapper existing = this.PlayerZonedCards[(int)zone].FirstOrDefault(c => c.ZonePos == card.ZonePos && card.Id != 4 && card.Id != 5);
+                if(existing != null)
+                {
+                    this.PlayerZonedCards[(int)zone].Remove(existing);
+                }
                 this.PlayerZonedCards[(int)zone].Add(card);
             }
             else
             {
+                CardWrapper existing = this.OpponentZonedCards[(int)zone].FirstOrDefault(c => c.ZonePos == card.ZonePos && card.Id != 36 && card.Id != 35);
+                if (existing != null)
+                {
+                    this.OpponentZonedCards[(int)zone].Remove(existing);
+                }
                 this.OpponentZonedCards[(int)zone].Add(card);
             }
         }
@@ -81,9 +92,13 @@ namespace HearthstoneBot
                 {
                     this.AddCardToZone(Zones.DECK, card);
                 }
+                else if(card.Zone == "REMOVEDFROMGAME")
+                {
+                    this.AddCardToZone(Zones.REMOVEDFROMGAME, card);
+                }
                 else
                 {
-                    throw new Exception("A NEW ZONE");
+                    //throw new Exception("A NEW ZONE");
                 }
             }
         }

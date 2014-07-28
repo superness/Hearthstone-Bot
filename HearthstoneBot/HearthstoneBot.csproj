@@ -32,9 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HearthstoneMemorySearchWrapper, Version=1.0.5319.41917, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="HearthstoneMemorySearchWrapper, Version=1.0.5321.40529, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Release\HearthstoneMemorySearchWrapper.dll</HintPath>
+      <HintPath>..\Debug\HearthstoneMemorySearchWrapper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameCards.cs" />
+    <Compile Include="PlayTracker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

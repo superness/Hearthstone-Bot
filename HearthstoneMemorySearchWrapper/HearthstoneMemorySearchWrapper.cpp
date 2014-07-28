@@ -20,6 +20,10 @@ namespace HearthstoneMemorySearchCLR
 		for (int i = 0; i < cards.size(); ++i)
 		{
 			CardWrapper^ wrapped = gcnew CardWrapper();
+
+			/*Card* ip = &cards[i];
+			Console::WriteLine(ip);
+*/
 			wrapped->Init(cards[i]);
 
 			wrappedCards->Add(wrapped);
