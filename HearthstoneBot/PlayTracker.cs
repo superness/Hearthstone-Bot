@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HearthstoneBot
 {
-    public class PlayTracker
+    public class PlayTracker : Singleton<PlayTracker>
     {
         public enum GameState
         {
@@ -21,6 +21,7 @@ namespace HearthstoneBot
 
         private HearthstoneMemorySearchWrapper searcher = new HearthstoneMemorySearchWrapper();
         private List<CardWrapper> lastTurnHand = null;
+        private List<CardWrapper> handShouldBe = null;
 
         public int Mana
         {
@@ -58,7 +59,7 @@ namespace HearthstoneBot
             List<CardWrapper> cards = searcher.GetCardList();
 
             this.Cards = new GameCards();
-            this.Cards.Init(cards);
+            this.Cards.Init(cards, this.handShouldBe);
 
             // No cards, must be idle
             if (this.Cards.PlayerHero == null)
@@ -97,6 +98,34 @@ namespace HearthstoneBot
                     this.State = GameState.MyTurn;
                     this.MaxMana++;
                     this.Mana = this.MaxMana;
+                }
+            }
+        }
+
+        public void CardPlayedFromHand(int zonePos)
+        {
+            this.handShouldBe = new List<CardWrapper>();
+
+            foreach(CardWrapper card in this.Cards.PlayerZonedCards[(int)GameCards.Zones.HAND])
+            {
+                CardWrapper newCard = new CardWrapper();
+
+                newCard.CardId = card.CardId;
+                newCard.Id = card.Id;
+                newCard.Name = card.Name;
+                newCard.Zone = card.Zone;
+                newCard.ZonePos = card.ZonePos;
+
+                this.handShouldBe.Add(newCard);
+            }
+
+            this.handShouldBe.Sort((a, b) => a.ZonePos - b.ZonePos);
+
+            foreach(CardWrapper card in this.handShouldBe)
+            {
+                if(card.ZonePos > zonePos)
+                {
+                    card.ZonePos--;
                 }
             }
         }

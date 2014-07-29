@@ -15,4 +15,6 @@ MEMFUNCSDLL_API struct Card
 	std::string cardId;
 	std::string zone;
 	int zonePos;
+
+	int memLocation;
 };

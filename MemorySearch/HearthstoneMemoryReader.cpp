@@ -160,6 +160,7 @@ std::vector<Card> HearthstoneMemoryReader::GetCards()
 
 		Card card;
 		card.name = cardName;
+		card.memLocation = (int)addresses[i];
 		for (int j = 0; j < subItems.size(); ++j)
 		{
 			std::vector<std::string> valuePair = split(subItems[j], '=');

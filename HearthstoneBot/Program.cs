@@ -13,23 +13,22 @@ namespace HearthstoneBot
 
         static void Main(string[] args)
         {
-            PlayTracker tracker = new PlayTracker();
             while (true)
             {
-                tracker.Update();
+                PlayTracker.Global.Update();
 
                 Console.Clear();
 
-                Console.WriteLine(String.Format("STATE - {0}", tracker.State));
-                Console.WriteLine(String.Format("MANA - {0} \\ {1}", tracker.Mana, tracker.MaxMana));
+                Console.WriteLine(String.Format("STATE - {0}", PlayTracker.Global.State));
+                Console.WriteLine(String.Format("MANA - {0} \\ {1}", PlayTracker.Global.Mana, PlayTracker.Global.MaxMana));
 
-                if(tracker.State == PlayTracker.GameState.NotInitialized || tracker.State == PlayTracker.GameState.Idle)
+                if (PlayTracker.Global.State == PlayTracker.GameState.NotInitialized || PlayTracker.Global.State == PlayTracker.GameState.Idle)
                 {
                     Thread.Sleep(5000);
                     continue;
                 }
 
-                GameCards gc = tracker.Cards;
+                GameCards gc = PlayTracker.Global.Cards;
 
                 PrintLabel(String.Format("PLAYER [{0}]", gc.PlayerHero.Name));
                 PrintLabel("HAND");
@@ -42,6 +41,8 @@ namespace HearthstoneBot
                 PrintCards(gc.OpponentZonedCards, GameCards.Zones.HAND);
                 PrintLabel("PLAY");
                 PrintCards(gc.OpponentZonedCards, GameCards.Zones.PLAY);
+
+                PlayAI.Global.Update();
             }
         }
 

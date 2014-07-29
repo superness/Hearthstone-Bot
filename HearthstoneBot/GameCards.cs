@@ -44,7 +44,7 @@ namespace HearthstoneBot
             if(card.Id <= 35 || card.Name == "The Coin")
             {
                 CardWrapper existing = this.PlayerZonedCards[(int)zone].FirstOrDefault(c => c.ZonePos == card.ZonePos && card.Id != 4 && card.Id != 5);
-                if(existing != null)
+                if(existing != null && zone != Zones.HAND)
                 {
                     this.PlayerZonedCards[(int)zone].Remove(existing);
                 }
@@ -60,7 +60,33 @@ namespace HearthstoneBot
                 this.OpponentZonedCards[(int)zone].Add(card);
             }
         }
-        public void Init(List<CardWrapper> cards)
+
+        private void CoalleseHand(List<CardWrapper> knownCards)
+        {
+            // If we have collisions resolve them with known cards
+            for(int i = 0; i < this.PlayerZonedCards[(int)Zones.HAND].Count; ++i)
+            {
+                var cardsAtPos = this.PlayerZonedCards[(int)Zones.HAND].Where(c => c.ZonePos == i);
+                if (cardsAtPos.Count() > 1)
+                {
+                    CardWrapper knownAtPos = knownCards.FirstOrDefault(c => c.ZonePos == i);
+
+                    if(knownAtPos != null)
+                    {
+                        foreach(CardWrapper card in cardsAtPos)
+                        {
+                            // Remove the cards that aren't known to be in this position
+                            if(card.Id != knownAtPos.Id)
+                            {
+                                this.PlayerZonedCards[(int)Zones.HAND].Remove(card);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void Init(List<CardWrapper> cards, List<CardWrapper> handShouldBe = null)
         {
             for (int i = (int)Zones.PLAY; i < (int)Zones.COUNT; ++i)
             {
@@ -100,6 +126,11 @@ namespace HearthstoneBot
                 {
                     //throw new Exception("A NEW ZONE");
                 }
+            }
+
+            if(handShouldBe != null)
+            {
+                this.CoalleseHand(handShouldBe);
             }
         }
     }
