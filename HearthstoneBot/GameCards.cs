@@ -24,69 +24,88 @@ namespace HearthstoneBot
         public List<CardWrapper>[] PlayerZonedCards = new List<CardWrapper>[(int)Zones.COUNT];
         public List<CardWrapper>[] OpponentZonedCards = new List<CardWrapper>[(int)Zones.COUNT];
 
+        public UniqueCardList PlayerHand = null;
+        public UniqueCardList PlayerPlay = null;
+        public UniqueCardList OpponentPlay = null;
+
         public CardWrapper PlayerHero
         {
-            get
-            {
-                return PlayerZonedCards[(int)Zones.PLAY].FirstOrDefault(c => c.Id == 4);
-            }
+            get;
+            set;
         }
         public CardWrapper OpponentHero
         {
-            get
-            {
-                return OpponentZonedCards[(int)Zones.PLAY].FirstOrDefault(c => c.Id == 36);
-            }
+            get;
+            set;
         }
 
-        private void AddCardToZone(Zones zone, CardWrapper card)
+        private void AddCardToZone(Zones zone, CardWrapper card, bool removeDuplicates = true)
         {
-            if(card.Id <= 35 || card.Name == "The Coin")
+            if(card.Id == 4)
             {
-                CardWrapper existing = this.PlayerZonedCards[(int)zone].FirstOrDefault(c => c.ZonePos == card.ZonePos && card.Id != 4 && card.Id != 5);
-                if(existing != null && zone != Zones.HAND)
-                {
-                    this.PlayerZonedCards[(int)zone].Remove(existing);
-                }
-                this.PlayerZonedCards[(int)zone].Add(card);
+                this.PlayerHero = card;
             }
-            else
+            else if(card.Id == 36)
             {
-                CardWrapper existing = this.OpponentZonedCards[(int)zone].FirstOrDefault(c => c.ZonePos == card.ZonePos && card.Id != 36 && card.Id != 35);
-                if (existing != null)
-                {
-                    this.OpponentZonedCards[(int)zone].Remove(existing);
-                }
-                this.OpponentZonedCards[(int)zone].Add(card);
+                this.OpponentHero = card;
             }
+            else if(card.ZonePos != 0 || card.Zone == "GRAVEYARD" || card.Zone == "SETASIDE")
+            {
+                if (card.Id <= 35 || card.Name == "The Coin")
+                {
+                    //CardWrapper existing = this.PlayerZonedCards[(int)zone].FirstOrDefault(c => c.ZonePos == card.ZonePos);
+                    //if (existing != null && zone != Zones.HAND)
+                    //{
+                    //    this.PlayerZonedCards[(int)zone].Remove(existing);
+                    //}
+                    this.PlayerZonedCards[(int)zone].Add(card);
+                }
+                else
+                {
+                    //CardWrapper existing = this.OpponentZonedCards[(int)zone].FirstOrDefault(c => c.ZonePos == card.ZonePos);
+                    //if (existing != null)
+                    //{
+                    //    this.OpponentZonedCards[(int)zone].Remove(existing);
+                    //}
+                    this.OpponentZonedCards[(int)zone].Add(card);
+                }
+            }
+
+            //if (removeDuplicates)
+            //{
+            //    this.RemoveDuplicateIds();
+            //}
         }
 
-        private void CoalleseHand(List<CardWrapper> knownCards)
+        private void RemoveDuplicateIds()
         {
-            // If we have collisions resolve them with known cards
-            for(int i = 0; i < this.PlayerZonedCards[(int)Zones.HAND].Count; ++i)
+            foreach(List<CardWrapper> cards in this.PlayerZonedCards)
             {
-                var cardsAtPos = this.PlayerZonedCards[(int)Zones.HAND].Where(c => c.ZonePos == i);
-                if (cardsAtPos.Count() > 1)
+                List<CardWrapper> toRemove = new List<CardWrapper>();
+                for (int i = cards.Count - 1; i >= 0; --i)
                 {
-                    CardWrapper knownAtPos = knownCards.FirstOrDefault(c => c.ZonePos == i);
+                    CardWrapper card = cards[i];
 
-                    if(knownAtPos != null)
+                    if(toRemove.Contains(card))
                     {
-                        foreach(CardWrapper card in cardsAtPos)
-                        {
-                            // Remove the cards that aren't known to be in this position
-                            if(card.Id != knownAtPos.Id)
-                            {
-                                this.PlayerZonedCards[(int)Zones.HAND].Remove(card);
-                            }
-                        }
+                        continue; // Already removing this guy, ignore
+                    }
+
+                    CardWrapper duplicate = cards.FirstOrDefault(c => c.Id == card.Id && c != card);
+
+                    if (duplicate != null)
+                    {
+                        toRemove.Add(card);
                     }
                 }
+                foreach(CardWrapper card in toRemove)
+                {
+                    cards.Remove(card);
+                }
             }
         }
 
-        public void Init(List<CardWrapper> cards, List<CardWrapper> handShouldBe = null)
+        public void Init(List<CardWrapper> cards, List<CardWrapper> handShouldBe = null, bool removeDuplicates = true)
         {
             for (int i = (int)Zones.PLAY; i < (int)Zones.COUNT; ++i)
             {
@@ -100,27 +119,27 @@ namespace HearthstoneBot
             {
                 if (card.Zone == "PLAY")
                 {
-                    this.AddCardToZone(Zones.PLAY, card);
+                    this.AddCardToZone(Zones.PLAY, card, removeDuplicates);
                 }
                 else if (card.Zone == "HAND")
                 {
-                    this.AddCardToZone(Zones.HAND, card);
+                    this.AddCardToZone(Zones.HAND, card, removeDuplicates);
                 }
                 else if (card.Zone == "GRAVEYARD")
                 {
-                    this.AddCardToZone(Zones.GRAVEYARD, card);
+                    this.AddCardToZone(Zones.GRAVEYARD, card, removeDuplicates);
                 }
                 else if (card.Zone == "SETASIDE")
                 {
-                    this.AddCardToZone(Zones.SETASIDE, card);
+                    this.AddCardToZone(Zones.SETASIDE, card, removeDuplicates);
                 }
                 else if (card.Zone == "DECK")
                 {
-                    this.AddCardToZone(Zones.DECK, card);
+                    this.AddCardToZone(Zones.DECK, card, removeDuplicates);
                 }
                 else if(card.Zone == "REMOVEDFROMGAME")
                 {
-                    this.AddCardToZone(Zones.REMOVEDFROMGAME, card);
+                    this.AddCardToZone(Zones.REMOVEDFROMGAME, card, removeDuplicates);
                 }
                 else
                 {
@@ -128,9 +147,22 @@ namespace HearthstoneBot
                 }
             }
 
-            if(handShouldBe != null)
+            this.PlayerHand = new UniqueCardList(Zones.HAND, this.PlayerZonedCards);
+            foreach (CardWrapper card in this.PlayerZonedCards[(int)Zones.HAND])
             {
-                this.CoalleseHand(handShouldBe);
+                this.PlayerHand.AddCardToList(card);
+            }
+
+            this.PlayerPlay = new UniqueCardList(Zones.PLAY, this.PlayerZonedCards);
+            foreach (CardWrapper card in this.PlayerZonedCards[(int)Zones.PLAY])
+            {
+                this.PlayerPlay.AddCardToList(card);
+            }
+
+            this.OpponentPlay = new UniqueCardList(Zones.PLAY, this.OpponentZonedCards);
+            foreach (CardWrapper card in this.OpponentZonedCards[(int)Zones.PLAY])
+            {
+                this.OpponentPlay.AddCardToList(card);
             }
         }
     }

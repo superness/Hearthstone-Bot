@@ -19,9 +19,10 @@ namespace HearthstoneBot
             NotInitialized
         }
 
-        private HearthstoneMemorySearchWrapper searcher = new HearthstoneMemorySearchWrapper();
+        public HearthstoneMemorySearchWrapper searcher = new HearthstoneMemorySearchWrapper();
         private List<CardWrapper> lastTurnHand = null;
-        private List<CardWrapper> handShouldBe = null;
+
+        public List<CardWrapper> unfiltered = null;
 
         public int Mana
         {
@@ -58,74 +59,81 @@ namespace HearthstoneBot
         {
             List<CardWrapper> cards = searcher.GetCardList();
 
+            this.unfiltered = cards;
             this.Cards = new GameCards();
-            this.Cards.Init(cards, this.handShouldBe);
+            this.Cards.Init(cards);
 
             // No cards, must be idle
-            if (this.Cards.PlayerHero == null)
+            if(this.Cards.PlayerHero == null)
             {
                 this.State = GameState.Idle;
                 return;
+            }
+            else if(this.State == GameState.Idle)
+            {
+                this.State = GameState.Mulliganing;
             }
 
             // We make assummptions that we are in the idle start when the app starts
             if(this.State == GameState.NotInitialized)
             {
                 throw new Exception("Start Hearthstone-Bot before entering a game!");
-                this.State = GameState.Idle;
             }
 
-            if(this.State == GameState.Idle)
+            // Game has started, we go from idle state into mulligan state
+            // Leave mulligan state once the number of cards in our hand has increased
+
+            if(this.State == GameState.Mulliganing)
             {
-                // Figure out if we have the starting turn or not
-                if(this.Cards.PlayerZonedCards[(int)GameCards.Zones.HAND].FirstOrDefault(c => c.Name == "The Coin") == null)
+                // We drew a card so we aren't in mulligan phase anymore
+                if (this.lastTurnHand != null && this.lastTurnHand.Count < this.Cards.PlayerHand.CardsInList.Count)
                 {
                     this.State = GameState.MyTurn;
                     this.MaxMana = 1;
                     this.Mana = 1;
                 }
-                else
-                {
-                    this.State = GameState.OpponentTurn;
-                    this.lastTurnHand = this.Cards.PlayerZonedCards[(int)GameCards.Zones.HAND];
-                }
+
+                this.lastTurnHand = this.Cards.PlayerHand.CardsInList;
             }
 
             if(this.State == GameState.OpponentTurn)
             {
-                if(this.lastTurnHand.Count < this.Cards.PlayerZonedCards[(int)GameCards.Zones.HAND].Count)
+                bool sameCards = true;
+                for (int i = 0; i < this.lastTurnHand.Count && i < this.Cards.PlayerHand.CardsInList.Count; ++i)
                 {
+                    CardWrapper handCard = this.Cards.PlayerHand.CardsInList[i];
+                    if(this.lastTurnHand.FirstOrDefault(c => c.Id == handCard.Id) == null)
+                    {
+                        sameCards = false;
+                        break;
+                    }
+                }
+
+                if (this.lastTurnHand.Count < this.Cards.PlayerHand.CardsInList.Count || sameCards == false)
+                {
+                    // Explain WHY it became my turn because I am very confused
+                    FileLogger.Global.LogLine("Switching turns");
+                    FileLogger.Global.LogLine("------------");
+                    FileLogger.Global.LogLine("LastTurnHand");
+                    FileLogger.Global.LogLine("------------");
+                    foreach(CardWrapper card in this.lastTurnHand)
+                    {
+                        FileLogger.Global.LogLine(String.Format("{0} | {1}", card.Name, card.Id));
+                    }
+                    FileLogger.Global.LogLine("------------");
+                    FileLogger.Global.LogLine("PlayerHand");
+                    FileLogger.Global.LogLine("------------");
+                    foreach(CardWrapper card in this.Cards.PlayerHand.CardsInList)
+                    {
+                        FileLogger.Global.LogLine(String.Format("{0} | {1}", card.Name, card.Id));
+                    }
+                    FileLogger.Global.LogLine(String.Empty);
+                    FileLogger.Global.LogLine(String.Empty);
+                    FileLogger.Global.LogLine(String.Empty);
+
                     this.State = GameState.MyTurn;
                     this.MaxMana++;
                     this.Mana = this.MaxMana;
-                }
-            }
-        }
-
-        public void CardPlayedFromHand(int zonePos)
-        {
-            this.handShouldBe = new List<CardWrapper>();
-
-            foreach(CardWrapper card in this.Cards.PlayerZonedCards[(int)GameCards.Zones.HAND])
-            {
-                CardWrapper newCard = new CardWrapper();
-
-                newCard.CardId = card.CardId;
-                newCard.Id = card.Id;
-                newCard.Name = card.Name;
-                newCard.Zone = card.Zone;
-                newCard.ZonePos = card.ZonePos;
-
-                this.handShouldBe.Add(newCard);
-            }
-
-            this.handShouldBe.Sort((a, b) => a.ZonePos - b.ZonePos);
-
-            foreach(CardWrapper card in this.handShouldBe)
-            {
-                if(card.ZonePos > zonePos)
-                {
-                    card.ZonePos--;
                 }
             }
         }
@@ -139,7 +147,7 @@ namespace HearthstoneBot
             else
             {
                 this.State = GameState.OpponentTurn;
-                this.lastTurnHand = this.Cards.PlayerZonedCards[(int)GameCards.Zones.HAND];
+                this.lastTurnHand = this.Cards.PlayerHand.CardsInList;
             }
         }
     }

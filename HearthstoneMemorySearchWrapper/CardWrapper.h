@@ -36,6 +36,20 @@ namespace HearthstoneMemorySearchCLR
 			this->Zone = Marshal::PtrToStringAnsi((IntPtr)(char *)c.zone.c_str());
 			this->Id = c.id;
 			this->ZonePos = c.zonePos;
+			this->MemoryLocation = c.memLocation;
+		}
+
+		property int MemoryLocation
+		{
+			int get()
+			{
+				return this->card->memLocation;
+			}
+
+			void set(int value)
+			{
+				this->card->memLocation = value;
+			}
 		}
 
 		property String ^Name

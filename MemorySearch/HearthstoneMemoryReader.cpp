@@ -196,3 +196,11 @@ std::vector<Card> HearthstoneMemoryReader::GetCards()
 
 	return cards;
 }
+
+void HearthstoneMemoryReader::MarkLocation(int memloc)
+{
+	HANDLE proc = GetProcessByName(L"Hearthstone");
+
+	char* buffer = '\0\0\0\0';
+	WriteProcessMemory(proc, (LPVOID)memloc, &buffer, 4, NULL);
+}
