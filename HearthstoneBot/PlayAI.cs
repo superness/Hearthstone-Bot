@@ -51,7 +51,9 @@ namespace HearthstoneBot
             }
             else if(PlayTracker.Global.State == PlayTracker.GameState.MyTurn)
             {
-                Thread.Sleep(10000);
+                Thread.Sleep(7000);
+
+                int manaToSpend = PlayTracker.Global.Mana;
 
                 // Coin first
                 CardWrapper coinCard = PlayTracker.Global.Cards.PlayerHand.CardsInList.FirstOrDefault(c => c.Name == "The Coin");
@@ -61,41 +63,61 @@ namespace HearthstoneBot
                     PlayTracker.Global.Update();
                     Program.UpdateDisplay();
 
+                    manaToSpend++;
+                    PlayTracker.Global.Mana = manaToSpend;
+
                     // Attempt to mark the memory so we don't find this 'dead' card again
                     //HearthstoneMemorySearchWrapper.MarkMemory(coinCard);
                 }
 
                 // Try to play everything? lolz
-                List<CardWrapper> cardsToPlay = new List<CardWrapper>();
-                for(int i = 0; i < PlayTracker.Global.Cards.PlayerHand.CardsInList.Count; ++i)
+                Program.PlayedThisTurn = new List<int>();
+                List<CardWrapper> triedToPlay = new List<CardWrapper>();
+                while (true)
                 {
-                    cardsToPlay.Add(PlayTracker.Global.Cards.PlayerHand.CardsInList[i]);
-                }
+                    int mostExpensiveToCast = 0;
+                    int idMostExpensive = -1;
+                    JsonCard jCardMostExpensive = null;
+                    CardWrapper cardMostExpensive = null;
 
-                // Play the card then update our card list to appropraitely grab the next card
-                foreach(CardWrapper toPlay in cardsToPlay)
-                {
                     for (int i = 0; i < PlayTracker.Global.Cards.PlayerHand.CardsInList.Count; ++i)
                     {
-                        if(PlayTracker.Global.Cards.PlayerHand.CardsInList[i].Id == toPlay.Id)
+                        CardWrapper card = PlayTracker.Global.Cards.PlayerHand.CardsInList[i];
+                        JsonCard jCard = Program.Cards.GetCardFromCardId(card.CardId);
+                        if (jCard.cost <= manaToSpend)
                         {
-                            this.PlayCard(i);
-
-                            Thread.Sleep(500);
-
-                            break;
+                            if (jCard.cost > mostExpensiveToCast && triedToPlay.FirstOrDefault(c => c.Id == card.Id) == null)
+                            {
+                                mostExpensiveToCast = jCard.cost;
+                                idMostExpensive = i;
+                                jCardMostExpensive = jCard;
+                                cardMostExpensive = card;
+                            }
                         }
                     }
 
-                    PlayTracker.Global.Update();
-                    Program.UpdateDisplay();
+                    // Play the most expensive card we can first
+                    if (idMostExpensive != -1)
+                    {
+                        this.PlayCard(idMostExpensive);
 
-                    //// If the card successfully played then mark it as 'dead'
-                    //if(PlayTracker.Global.Cards.PlayerPlay.CardsInList.FirstOrDefault(c => c.Id == toPlay.Id) != null)
-                    //{
-                    //    // Attempt to mark the memory so we don't find this 'dead' card again
-                    //    HearthstoneMemorySearchWrapper.MarkMemory(toPlay);
-                    //}
+                        Thread.Sleep(1000);
+
+                        PlayTracker.Global.Update();
+                        Program.UpdateDisplay();
+                        CardWrapper toPlay = PlayTracker.Global.Cards.PlayerHand.CardsInList.FirstOrDefault(c => c.Id == cardMostExpensive.Id);
+                        triedToPlay.Add(cardMostExpensive);
+                        if (toPlay == null)
+                        {
+                            manaToSpend -= jCardMostExpensive.cost;
+                            PlayTracker.Global.Mana = manaToSpend;
+                            Program.PlayedThisTurn.Add(cardMostExpensive.Id);
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 PlayTracker.Global.Update();
@@ -104,28 +126,66 @@ namespace HearthstoneBot
                 // Attack!
                 for (int i = 0; i < PlayTracker.Global.Cards.PlayerPlay.CardsInList.Count; ++i)
                 {
-                    // Attack any minions alive
-                    for (int j = 0; j < PlayTracker.Global.Cards.OpponentPlay.CardsInList.Count; ++j)
-                    {
-                        this.AttackMinion(i, j);
+                    CardWrapper card = PlayTracker.Global.Cards.PlayerPlay.CardsInList[i];
+                    JsonCard jCard = Program.Cards.GetCardFromCardId(card.CardId);
 
-                        Thread.Sleep(500);
+                    // If this minion was just played and doesn't have charge then skip it
+                    if (Program.PlayedThisTurn.Contains(card.Id))
+                    {
+                        if(jCard.mechanics == null || jCard.mechanics.Contains("Charge") == false)
+                        {
+                            continue;
+                        }
                     }
 
-                    PlayTracker.Global.Update();
-                    Program.UpdateDisplay();
+                    // Find a target
+                    List<JsonCard> enemyCards = new List<JsonCard>();
+                    for (int j = 0; j < PlayTracker.Global.Cards.OpponentPlay.CardsInList.Count; ++j)
+                    {
+                        CardWrapper enemyCard = PlayTracker.Global.Cards.OpponentPlay.CardsInList[j];
+                        JsonCard jCardEnemy = Program.Cards.GetCardFromCardId(enemyCard.CardId);
+                        if(jCardEnemy != null)
+                            enemyCards.Add(jCardEnemy);
+                    }
 
-                    if(PlayTracker.Global.Cards.PlayerPlay.CardsInList.Count > i)
+                    // Look for anyone with taunt that we have to attack
+                    bool didAttack = false;
+                    JsonCard tauntEnemy = enemyCards.FirstOrDefault(c => c != null && c.mechanics != null && c.mechanics.Contains("Taunt"));
+                    if(tauntEnemy != null)
+                    {
+                        this.AttackMinion(i, enemyCards.IndexOf(tauntEnemy));
+                        didAttack = true;
+                    }
+                    else if(enemyCards.Count > 0)
+                    {
+                        // Look for a value attack
+                        // Attack a minion if I can kill it and not die
+                        int j = 0;
+                        foreach (JsonCard jCardEnemy in enemyCards)
+                        {
+                            if(jCard.attack >= jCardEnemy.health && jCard.health > jCardEnemy.attack)
+                            {
+                                this.AttackMinion(i, j);
+                                didAttack = true;
+                                break;
+                            }
+                            ++j;
+                        }
+                    }
+                    if(didAttack == false)
                     {
                         // Attack hero
                         this.AttackHero(i);
-
-                        PlayTracker.Global.Update();
-                        Program.UpdateDisplay();
+                        didAttack = true;
                     }
-
-                    //Thread.Sleep(1000);
+                    PlayTracker.Global.Update();
+                    Program.UpdateDisplay();
                 }
+
+                // Use hero power
+                this.MoveClickWrapper(780, 640, ClickFlags.LongLeftClick);
+
+                Thread.Sleep(1000);
 
                 this.PassTurn();
             }

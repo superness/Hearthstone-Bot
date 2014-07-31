@@ -36,6 +36,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Debug\HearthstoneMemorySearchWrapper.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\External\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Super">
       <HintPath>..\External\Super.dll</HintPath>
     </Reference>
@@ -48,8 +51,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CardCollectionJson.cs" />
     <Compile Include="FileLogger.cs" />
     <Compile Include="GameCards.cs" />
+    <Compile Include="JsonCard.cs" />
     <Compile Include="PlayAI.cs" />
     <Compile Include="PlayerHandManager.cs" />
     <Compile Include="PlayTracker.cs" />

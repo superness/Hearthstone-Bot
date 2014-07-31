@@ -55,6 +55,12 @@ namespace HearthstoneBot
 
             if(existsInOtherZone == false)
             {
+                // Check if it exists in our hand
+                CardWrapper inHandCard = this.CardsInList.FirstOrDefault(c => c.Id == card.Id);
+                if(inHandCard != null)
+                {
+                    this.CardsInList.Remove(inHandCard);
+                }
                 this.CardsInList.Add(card);
             }
         }

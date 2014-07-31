@@ -1,6 +1,8 @@
 ﻿using HearthstoneMemorySearchCLR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -10,9 +12,18 @@ namespace HearthstoneBot
 {
     class Program
     {
+        public static CardCollectionJson Cards = null;
+        public static List<int> PlayedThisTurn = null;
 
         static void Main(string[] args)
         {
+            string jsonfile = "AllSets.json";
+            using (StreamReader r = new StreamReader(jsonfile))
+            {
+                string json = r.ReadToEnd();
+                Program.Cards = JsonConvert.DeserializeObject<CardCollectionJson>(json);
+            }
+
             while (true)
             {
                 PlayTracker.Global.Update();
@@ -75,6 +86,18 @@ namespace HearthstoneBot
             PrintCards(unfilteredCards.OpponentZonedCards, GameCards.Zones.HAND);
             PrintLabel("PLAY");
             PrintCards(unfilteredCards.OpponentZonedCards, GameCards.Zones.PLAY);
+
+            Console.WriteLine();
+            Console.WriteLine();
+            PrintLabel("PLAYED THIS TURN");
+            if (Program.PlayedThisTurn == null)
+                return;
+            foreach(int i in Program.PlayedThisTurn)
+            {
+                Console.Write(i);
+                Console.Write(", ");
+            }
+            Console.WriteLine();
         }
 
         private static void PrintCards(List<CardWrapper>[] cardGroup, GameCards.Zones zone)

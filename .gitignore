@@ -86,3 +86,8 @@ HearthstoneBot/bin/Debug/Super.dll
 HearthstoneBot/bin/Release/HearthstoneMemorySearchWrapper.dll
 Release/HearthstoneMemorySearch.dll
 Release/HearthstoneMemorySearchWrapper.dll
+HearthstoneMemorySearchWrapper/Release/app.res
+HearthstoneMemorySearchWrapper/Release/HearthstoneMemorySearchWrapper.pch
+HearthstoneBot/bin/Release/Super.dll
+HearthstoneBot/bin/Debug/Newtonsoft.Json.xml
+HearthstoneBot/bin/Debug/Newtonsoft.Json.dll

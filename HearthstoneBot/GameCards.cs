@@ -152,18 +152,42 @@ namespace HearthstoneBot
             {
                 this.PlayerHand.AddCardToList(card);
             }
+            foreach (CardWrapper card in this.PlayerZonedCards[(int)Zones.HAND])
+            {
+                if(this.PlayerHand.CardsInList.FirstOrDefault(c => c.ZonePos == card.ZonePos) == null)
+                {
+                    this.PlayerHand.AddCardToList(card);
+                }
+            }
+            this.PlayerHand.CardsInList.Sort((x, y) => x.ZonePos - y.ZonePos);
 
             this.PlayerPlay = new UniqueCardList(Zones.PLAY, this.PlayerZonedCards);
             foreach (CardWrapper card in this.PlayerZonedCards[(int)Zones.PLAY])
             {
                 this.PlayerPlay.AddCardToList(card);
             }
+            foreach (CardWrapper card in this.PlayerZonedCards[(int)Zones.PLAY])
+            {
+                if (this.PlayerPlay.CardsInList.FirstOrDefault(c => c.ZonePos == card.ZonePos) == null)
+                {
+                    this.PlayerPlay.AddCardToList(card);
+                }
+            }
+            this.PlayerPlay.CardsInList.Sort((x, y) => x.ZonePos - y.ZonePos);
 
             this.OpponentPlay = new UniqueCardList(Zones.PLAY, this.OpponentZonedCards);
             foreach (CardWrapper card in this.OpponentZonedCards[(int)Zones.PLAY])
             {
                 this.OpponentPlay.AddCardToList(card);
             }
+            foreach (CardWrapper card in this.OpponentZonedCards[(int)Zones.PLAY])
+            {
+                if (this.OpponentPlay.CardsInList.FirstOrDefault(c => c.ZonePos == card.ZonePos) == null)
+                {
+                    this.OpponentPlay.AddCardToList(card);
+                }
+            }
+            this.OpponentPlay.CardsInList.Sort((x, y) => x.ZonePos - y.ZonePos);
         }
     }
 }
