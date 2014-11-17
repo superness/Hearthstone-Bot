@@ -15,6 +15,8 @@ namespace HearthstoneBot
         public static CardCollectionJson Cards = null;
         public static List<int> PlayedThisTurn = null;
 
+        private static List<CardWrapper> played = new List<CardWrapper>();
+
         static void Main(string[] args)
         {
             string jsonfile = "AllSets.json";
@@ -28,16 +30,40 @@ namespace HearthstoneBot
             {
                 PlayTracker.Global.Update();
 
-                UpdateDisplay();
+                //UpdateDisplay();
 
+                //if (PlayTracker.Global.State == PlayTracker.GameState.NotInitialized || PlayTracker.Global.State == PlayTracker.GameState.Idle)
+                //{
+                    //Thread.Sleep(5000);
+                    //continue;
+                //}
 
-                if (PlayTracker.Global.State == PlayTracker.GameState.NotInitialized || PlayTracker.Global.State == PlayTracker.GameState.Idle)
+                //PlayAI.Global.Update();
+
+                // Do helper stuff
+                AddToPlayed(PlayTracker.Global.Cards.PlayerHand.CardsInList);
+                AddToPlayed(PlayTracker.Global.Cards.PlayerPlay.CardsInList);
+                AddToPlayed(PlayTracker.Global.Cards.PlayerZonedCards[(int)GameCards.Zones.GRAVEYARD]);
+                AddToPlayed(PlayTracker.Global.Cards.PlayerZonedCards[(int)GameCards.Zones.REMOVEDFROMGAME]);
+                AddToPlayed(PlayTracker.Global.Cards.PlayerZonedCards[(int)GameCards.Zones.SETASIDE]);
+
+                // Update display
+                Console.Clear();
+                foreach(CardWrapper card in played)
                 {
-                    Thread.Sleep(5000);
-                    continue;
+                    Console.WriteLine(card.Name);
                 }
+            }
+        }
 
-                PlayAI.Global.Update();
+        private static void AddToPlayed(List<CardWrapper> cards)
+        {
+            foreach (CardWrapper card in cards)
+            {
+                if (!played.Contains(card))
+                {
+                    played.Add(card);
+                }
             }
         }
 

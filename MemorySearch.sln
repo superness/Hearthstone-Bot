@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HearthstoneMemorySearch", "MemorySearch\MemorySearch.vcxproj", "{1BF6CD92-97BC-4ED0-AE3E-30DF594C9B89}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HearthstoneBot", "HearthstoneBot\HearthstoneBot.csproj", "{790F8F64-9508-4A31-98C5-DA6C802BA0B5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HearthstoneMemoryApp", "HearthstoneMemoryApp\HearthstoneMemoryApp.vcxproj", "{E4FDA2E7-F9FF-4D01-A274-671F18E41740}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HearthstoneLogReader", "HearthstoneLogReader\HearthstoneLogReader.csproj", "{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,20 @@ Global
 		{E4FDA2E7-F9FF-4D01-A274-671F18E41740}.Release|Win32.ActiveCfg = Release|Win32
 		{E4FDA2E7-F9FF-4D01-A274-671F18E41740}.Release|Win32.Build.0 = Release|Win32
 		{E4FDA2E7-F9FF-4D01-A274-671F18E41740}.Release|x64.ActiveCfg = Release|Win32
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Release|ARM.ActiveCfg = Release|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Release|Win32.ActiveCfg = Release|Any CPU
+		{FCB7D468-BFC8-4943-870B-EEDA2B0EB952}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

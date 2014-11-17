@@ -75,10 +75,10 @@ namespace HearthstoneBot
             }
 
             // We make assummptions that we are in the idle start when the app starts
-            if(this.State == GameState.NotInitialized)
-            {
-                throw new Exception("Start Hearthstone-Bot before entering a game!");
-            }
+            //if(this.State == GameState.NotInitialized)
+            //{
+                //throw new Exception("Start Hearthstone-Bot before entering a game!");
+            //}
 
             // Game has started, we go from idle state into mulligan state
             // Leave mulligan state once the number of cards in our hand has increased

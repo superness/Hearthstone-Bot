@@ -120,8 +120,13 @@ namespace HearthstoneBot
                     }
                 }
 
-                PlayTracker.Global.Update();
-                Program.UpdateDisplay();
+                //PlayTracker.Global.Update();
+                //Program.UpdateDisplay();
+
+                // Use hero power
+                this.MoveClickWrapper(780, 640, ClickFlags.LongLeftClick);
+
+                Thread.Sleep(1000);
 
                 // Attack!
                 for (int i = 0; i < PlayTracker.Global.Cards.PlayerPlay.CardsInList.Count; ++i)
@@ -181,11 +186,6 @@ namespace HearthstoneBot
                     PlayTracker.Global.Update();
                     Program.UpdateDisplay();
                 }
-
-                // Use hero power
-                this.MoveClickWrapper(780, 640, ClickFlags.LongLeftClick);
-
-                Thread.Sleep(1000);
 
                 this.PassTurn();
             }
