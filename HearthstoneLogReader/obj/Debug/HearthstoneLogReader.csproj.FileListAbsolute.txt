@@ -1,0 +1,10 @@
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\bin\Debug\HearthstoneLogReader.exe.config
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\bin\Debug\HearthstoneLogReader.exe
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\bin\Debug\HearthstoneLogReader.pdb
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\obj\Debug\HearthstoneLogReader.csprojResolveAssemblyReference.cache
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\obj\Debug\HearthstoneLogReader.exe
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\obj\Debug\HearthstoneLogReader.pdb
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\bin\Debug\Newtonsoft.Json.dll
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\bin\Debug\Newtonsoft.Json.xml
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\bin\Debug\Super.dll
+C:\Users\TheGreatCaptainPatri\Documents\GitHub\Hearthstone-Bot\HearthstoneLogReader\bin\Debug\Super.pdb
