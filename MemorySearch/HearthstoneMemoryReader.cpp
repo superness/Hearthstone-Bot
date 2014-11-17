@@ -160,9 +160,15 @@ std::vector<Card> HearthstoneMemoryReader::GetCards()
 
 		Card card;
 		card.name = cardName;
+		card.memLocation = (int)addresses[i];
 		for (int j = 0; j < subItems.size(); ++j)
 		{
 			std::vector<std::string> valuePair = split(subItems[j], '=');
+
+			if (valuePair.size() != 2)
+			{
+				break;
+			}
 
 			if (valuePair[0] == std::string("id"))
 			{
@@ -189,4 +195,12 @@ std::vector<Card> HearthstoneMemoryReader::GetCards()
 	}
 
 	return cards;
+}
+
+void HearthstoneMemoryReader::MarkLocation(int memloc)
+{
+	HANDLE proc = GetProcessByName(L"Hearthstone");
+
+	char* buffer = '\0\0\0\0';
+	WriteProcessMemory(proc, (LPVOID)memloc, &buffer, 4, NULL);
 }

@@ -11,6 +11,11 @@ using namespace System::Collections::Generic;
 
 namespace HearthstoneMemorySearchCLR
 {
+	void HearthstoneMemorySearchWrapper::MarkMemory(CardWrapper^ card)
+	{
+		HearthstoneMemoryReader::MarkLocation(card->MemoryLocation);
+	}
+
 	List<CardWrapper^>^ HearthstoneMemorySearchWrapper::GetCardList()
 	{
 		std::vector<Card> cards = HearthstoneMemoryReader::GetCards();
@@ -20,6 +25,10 @@ namespace HearthstoneMemorySearchCLR
 		for (int i = 0; i < cards.size(); ++i)
 		{
 			CardWrapper^ wrapped = gcnew CardWrapper();
+
+			/*Card* ip = &cards[i];
+			Console::WriteLine(ip);
+*/
 			wrapped->Init(cards[i]);
 
 			wrappedCards->Add(wrapped);

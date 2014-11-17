@@ -1,56 +1,118 @@
 ﻿using HearthstoneMemorySearchCLR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HearthstoneBot
 {
     class Program
     {
+        public static CardCollectionJson Cards = null;
+        public static List<int> PlayedThisTurn = null;
 
         static void Main(string[] args)
         {
-            HearthstoneMemorySearchWrapper searcher = new HearthstoneMemorySearchWrapper();
+            string jsonfile = "AllSets.json";
+            using (StreamReader r = new StreamReader(jsonfile))
+            {
+                string json = r.ReadToEnd();
+                Program.Cards = JsonConvert.DeserializeObject<CardCollectionJson>(json);
+            }
 
-            List<CardWrapper> cards = searcher.GetCardList();
+            while (true)
+            {
+                PlayTracker.Global.Update();
 
-            GameCards gc = new GameCards();
-            gc.Init(cards);
+                UpdateDisplay();
+
+
+                if (PlayTracker.Global.State == PlayTracker.GameState.NotInitialized || PlayTracker.Global.State == PlayTracker.GameState.Idle)
+                {
+                    Thread.Sleep(5000);
+                    continue;
+                }
+
+                PlayAI.Global.Update();
+            }
+        }
+
+        public static void UpdateDisplay()
+        {
+            Console.Clear();
+
+            Console.WriteLine(String.Format("STATE - {0}", PlayTracker.Global.State));
+            Console.WriteLine(String.Format("MANA - {0} \\ {1}", PlayTracker.Global.Mana, PlayTracker.Global.MaxMana));
+
+            if (PlayTracker.Global.State == PlayTracker.GameState.NotInitialized || PlayTracker.Global.State == PlayTracker.GameState.Idle)
+            {
+                return;
+            }
+
+            GameCards gc = PlayTracker.Global.Cards;
 
             PrintLabel(String.Format("PLAYER [{0}]", gc.PlayerHero.Name));
             PrintLabel("HAND");
-            PrintCards(gc.PlayerZonedCards, GameCards.Zones.HAND);
+            PrintCards(gc.PlayerHand.CardsInList);
             PrintLabel("PLAY");
-            PrintCards(gc.PlayerZonedCards, GameCards.Zones.PLAY);
-            //PrintLabel("DECK");
-            //PrintCards(gc.PlayerZonedCards, GameCards.Zones.DECK);
-            //PrintLabel("GRAVEYARD");
-            //PrintCards(gc.PlayerZonedCards, GameCards.Zones.GRAVEYARD);
-            //PrintLabel("STASIDE");
-            //PrintCards(gc.PlayerZonedCards, GameCards.Zones.SETASIDE);
+            PrintCards(gc.PlayerPlay.CardsInList);
 
-            PrintLabel(String.Format("OPPONENT [{0}]", gc.OpponentHero.Name));
+            PrintLabel(String.Format("OPPONENT [{0}]", gc.OpponentHero != null ? gc.OpponentHero.Name : "NOT FOUND"));
             PrintLabel("HAND");
             PrintCards(gc.OpponentZonedCards, GameCards.Zones.HAND);
             PrintLabel("PLAY");
-            PrintCards(gc.OpponentZonedCards, GameCards.Zones.PLAY);
-            //PrintLabel("DECK");
-            //PrintCards(gc.OpponentZonedCards, GameCards.Zones.DECK);
-            //PrintLabel("GRAVEYARD");
-            //PrintCards(gc.OpponentZonedCards, GameCards.Zones.GRAVEYARD);
-            //PrintLabel("STASIDE");
-            //PrintCards(gc.OpponentZonedCards, GameCards.Zones.SETASIDE);
+            PrintCards(gc.OpponentPlay.CardsInList);
+            PrintLabel("GRAVEYARD");
+            PrintCards(gc.OpponentZonedCards, GameCards.Zones.GRAVEYARD);
 
-            Console.ReadLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            GameCards unfilteredCards = new GameCards();
+            unfilteredCards.Init(PlayTracker.Global.unfiltered, null, false);
+
+            PrintLabel(String.Format("PLAYER [{0}]", unfilteredCards.PlayerHero.Name));
+            PrintLabel("HAND");
+            PrintCards(unfilteredCards.PlayerZonedCards, GameCards.Zones.HAND);
+            PrintLabel("PLAY");
+            PrintCards(unfilteredCards.PlayerZonedCards, GameCards.Zones.PLAY);
+
+            PrintLabel(String.Format("OPPONENT [{0}]", unfilteredCards.OpponentHero != null ? unfilteredCards.OpponentHero.Name : "NOT FOUND"));
+            PrintLabel("HAND");
+            PrintCards(unfilteredCards.OpponentZonedCards, GameCards.Zones.HAND);
+            PrintLabel("PLAY");
+            PrintCards(unfilteredCards.OpponentZonedCards, GameCards.Zones.PLAY);
+
+            Console.WriteLine();
+            Console.WriteLine();
+            PrintLabel("PLAYED THIS TURN");
+            if (Program.PlayedThisTurn == null)
+                return;
+            foreach(int i in Program.PlayedThisTurn)
+            {
+                Console.Write(i);
+                Console.Write(", ");
+            }
+            Console.WriteLine();
         }
 
         private static void PrintCards(List<CardWrapper>[] cardGroup, GameCards.Zones zone)
         {
             foreach (CardWrapper card in cardGroup[(int)zone])
             {
-                Console.WriteLine(String.Format("{0} @ {1}", card.Name, card.ZonePos));
+                Console.WriteLine(String.Format("{0} @ {1} | {2}", card.Name, card.ZonePos, card.Id));
+            }
+        }
+
+        private static void PrintCards(List<CardWrapper> cards)
+        {
+            foreach (CardWrapper card in cards)
+            {
+                Console.WriteLine(String.Format("{0} @ {1} | {2}", card.Name, card.ZonePos, card.Id));
             }
         }
 

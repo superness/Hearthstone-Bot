@@ -32,9 +32,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HearthstoneMemorySearchWrapper, Version=1.0.5319.41917, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="HearthstoneMemorySearchWrapper, Version=1.0.5321.40529, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Release\HearthstoneMemorySearchWrapper.dll</HintPath>
+      <HintPath>..\Debug\HearthstoneMemorySearchWrapper.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\External\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Super">
+      <HintPath>..\External\Super.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -45,9 +51,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CardCollectionJson.cs" />
+    <Compile Include="FileLogger.cs" />
     <Compile Include="GameCards.cs" />
+    <Compile Include="JsonCard.cs" />
+    <Compile Include="PlayAI.cs" />
+    <Compile Include="PlayerHandManager.cs" />
+    <Compile Include="PlayTracker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Singleton.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

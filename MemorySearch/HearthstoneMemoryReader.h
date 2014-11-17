@@ -11,4 +11,5 @@ MEMFUNCSDLL_API class HearthstoneMemoryReader
 {
 public:
 	static MEMFUNCSDLL_API std::vector<Card> GetCards();
+	static MEMFUNCSDLL_API void MarkLocation(int memloc);
 };

@@ -5,7 +5,10 @@
 #include <Card.h>
 #include <msclr/marshal_cppstd.h>
 
+#using <mscorlib.dll> 
+
 using namespace System;
+using namespace System::Runtime::InteropServices;
 
 namespace HearthstoneMemorySearchCLR
 {
@@ -28,11 +31,25 @@ namespace HearthstoneMemorySearchCLR
 		{
 			this->card = new Card();
 
-			this->Name = gcnew String(c.name.c_str());
-			this->CardId = gcnew String(c.cardId.c_str());
-			this->Zone = gcnew String(c.zone.c_str());
+			this->Name = Marshal::PtrToStringAnsi((IntPtr)(char *)c.name.c_str());
+			this->CardId = Marshal::PtrToStringAnsi((IntPtr)(char *)c.cardId.c_str());
+			this->Zone = Marshal::PtrToStringAnsi((IntPtr)(char *)c.zone.c_str());
 			this->Id = c.id;
 			this->ZonePos = c.zonePos;
+			this->MemoryLocation = c.memLocation;
+		}
+
+		property int MemoryLocation
+		{
+			int get()
+			{
+				return this->card->memLocation;
+			}
+
+			void set(int value)
+			{
+				this->card->memLocation = value;
+			}
 		}
 
 		property String ^Name
@@ -44,7 +61,14 @@ namespace HearthstoneMemorySearchCLR
 
 			void set(String ^value)
 			{
-				this->card->name = std::string(msclr::interop::marshal_as< std::string >(value));
+				if (!String::IsNullOrEmpty(value))
+				{
+					this->card->name = std::string(msclr::interop::marshal_as< std::string >(value));
+				}
+				else
+				{
+					this->card->zone = "NULL";
+				}
 			}
 		}
 
@@ -57,7 +81,14 @@ namespace HearthstoneMemorySearchCLR
 
 			void set(String ^value)
 			{
-				this->card->cardId = std::string(msclr::interop::marshal_as< std::string >(value));
+				if (!String::IsNullOrEmpty(value))
+				{
+					this->card->cardId = std::string(msclr::interop::marshal_as< std::string >(value));
+				}
+				else
+				{
+					this->card->zone = "NULL";
+				}
 			}
 		}
 
@@ -70,7 +101,14 @@ namespace HearthstoneMemorySearchCLR
 
 			void set(String ^value)
 			{
-				this->card->zone = std::string(msclr::interop::marshal_as< std::string >(value));
+				if (!String::IsNullOrEmpty(value))
+				{
+					this->card->zone = std::string(msclr::interop::marshal_as< std::string >(value));
+				}
+				else
+				{
+					this->card->zone = "NULL";
+				}
 			}
 		}
 

@@ -16,5 +16,6 @@ namespace HearthstoneMemorySearchCLR {
 	{
 	public:
 		List<CardWrapper^>^ GetCardList();
+		static void MarkMemory(CardWrapper^ card);
 	};
 }
